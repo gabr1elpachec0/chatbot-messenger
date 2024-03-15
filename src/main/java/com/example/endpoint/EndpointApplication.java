@@ -29,17 +29,19 @@ class WebhookController {
 			return "Meu nome é Gabriel Gomes Pacheco";
 		} else if (text.contains("idade") || text.contains("anos")) {
 			return "Eu tenho 18 anos de idade";
+		} else if (text.contains("oi") || text.contains("ola")) {
+			return "Olá, sou um bot do Messenger!";
 		} else {
-			return "Olá, sou um bot e ainda não consigo responder a isso";
+			return "Desculpe, ainda não consigo responder a isso";
 		}
 	}
 
 	private RestTemplate restTemplate = new RestTemplate();
 
-	private void sendResponse(String recipientId, String responseText) {
+	private void sendResponse(String recipientId, String responseText, String pageId) {
 		String pageAccessToken = System.getenv("PAGE_ACCESS_TOKEN");
-		//System.out.println(pageAccessToken);
-		String url = "https://graph.facebook.com/v19.0/112796213566995/messages?access_token=" + pageAccessToken;
+
+		String url = "https://graph.facebook.com/v19.0/" + pageId + "/messages?access_token=" + pageAccessToken;
 
 		HttpHeaders headers = new HttpHeaders();
 		headers.setContentType(MediaType.APPLICATION_JSON);
@@ -61,12 +63,12 @@ class WebhookController {
 	public ResponseEntity<String> handleWebhookEvent(@RequestBody JsonNode payload) {
 		JsonNode objectNode = payload.get("object");
 		JsonNode entryNode = payload.get("entry");
-		//String recipientId = "7871157799602319";
 
 		if (objectNode != null && objectNode.asText().equals("page")) {
 			if (entryNode != null && entryNode.isArray()) {
 				for (JsonNode entry : entryNode) {
 					JsonNode messagingNode = entry.get("messaging");
+					String pageId = entry.get("id").asText();
 
 					if (messagingNode != null && messagingNode.isArray()) {
 						for (JsonNode messaging : messagingNode) {
@@ -79,7 +81,7 @@ class WebhookController {
 
 								if (text != null) {
 									String responseText = generateResponse(text);
-									sendResponse(senderId, responseText);
+									sendResponse(senderId, responseText, pageId);
 								}
 							}
 						}
