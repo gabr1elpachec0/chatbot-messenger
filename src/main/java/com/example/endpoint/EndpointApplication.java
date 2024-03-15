@@ -20,7 +20,7 @@ public class EndpointApplication {
 
 @RestController
 class WebhookController {
-	private String verifyToken = "EAAWYWyBnmbkBO7dqem4tS2jspslHbprZBZCFSfR3is8dD8YcIZC6ywq1TDstZBTkFjJJjVwDHoPD3tzun5oEhENhglW148HeoNhGKIyKPJBgOcEZC0spP5ROr48QZChrka1Ac4ErtNkkq2vvT4M5AfGROfiQ3AAYvXz9RqOwfMmb2OOEXYrsABIkVOR7tcEK4FxZAxWgIYrGAJmjOkYwPcNzxWJRcIZD";
+	private String verifyToken = System.getenv("VERIFY_ACCESS_TOKEN");
 
 	private String generateResponse(String text) {
 		if (text.equalsIgnoreCase("Qual o seu nome?")) {
@@ -35,7 +35,9 @@ class WebhookController {
 	private RestTemplate restTemplate = new RestTemplate();
 
 	private void sendResponse(String recipientId, String responseText) {
-		String url = "https://graph.facebook.com/v19.0/112796213566995/messages?access_token=EAAWYWyBnmbkBOZBrC1YtduZAdfZCup3KN5xKkfVqdzRR0r0MrvgXbkE3YvYYGLnEluycghwe9mhNaQh15j2TLSLZBgZCdPRl17918ZAAhtWZAxNcaQtbqCnsQkPzw9VBTrENwMPZBehSGkCKe3shZBf4QezzozHmu8OrWy1tqdNiWurTjkhcBqeawB1SQgZAppyDIa";
+		String pageAccessToken = System.getenv("PAGE_ACCESS_TOKEN");
+		//System.out.println(pageAccessToken);
+		String url = "https://graph.facebook.com/v19.0/112796213566995/messages?access_token=" + pageAccessToken;
 
 		HttpHeaders headers = new HttpHeaders();
 		headers.setContentType(MediaType.APPLICATION_JSON);
@@ -57,7 +59,7 @@ class WebhookController {
 	public ResponseEntity<String> handleWebhookEvent(@RequestBody JsonNode payload) {
 		JsonNode objectNode = payload.get("object");
 		JsonNode entryNode = payload.get("entry");
-		String recipientId = "7871157799602319";
+		//String recipientId = "7871157799602319";
 
 		if (objectNode != null && objectNode.asText().equals("page")) {
 			if (entryNode != null && entryNode.isArray()) {
@@ -67,14 +69,15 @@ class WebhookController {
 					if (messagingNode != null && messagingNode.isArray()) {
 						for (JsonNode messaging : messagingNode) {
 							JsonNode messageNode = messaging.get("message");
-							//String senderId = String.valueOf(messaging.get("sender").get("id"));
+							JsonNode senderNode = messaging.get("sender");
 
 							if (messageNode != null && messageNode.has("text")) {
 								String text = messageNode.get("text").asText();
+								String senderId = senderNode.get("id").asText();
 
 								if (text != null) {
 									String responseText = generateResponse(text);
-									sendResponse(recipientId, responseText);
+									sendResponse(senderId, responseText);
 								}
 							}
 						}
@@ -92,7 +95,6 @@ class WebhookController {
 			@RequestParam(name = "hub.mode") String mode,
 			@RequestParam(name = "hub.verify_token") String token,
 			@RequestParam(name = "hub.challenge") int challenge
-
 	)
 	{
 		if (mode != null && token != null) {
