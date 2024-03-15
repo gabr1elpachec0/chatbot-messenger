@@ -23,12 +23,14 @@ class WebhookController {
 	private String verifyToken = System.getenv("VERIFY_ACCESS_TOKEN");
 
 	private String generateResponse(String text) {
-		if (text.equalsIgnoreCase("Qual o seu nome?")) {
+		text = text.toLowerCase();
+
+		if (text.contains("nome") || text.contains("chama")) {
 			return "Meu nome é Gabriel Gomes Pacheco";
-		} else if (text.equalsIgnoreCase("Qual a sua idade?")) {
+		} else if (text.contains("idade") || text.contains("anos")) {
 			return "Eu tenho 18 anos de idade";
 		} else {
-			return "Desculpe, não sei responder a essa pergunta";
+			return "Olá, sou um bot e ainda não consigo responder a isso";
 		}
 	}
 
