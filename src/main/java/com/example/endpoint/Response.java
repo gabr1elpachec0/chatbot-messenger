@@ -1,5 +1,6 @@
 package com.example.endpoint;
 
+import com.example.endpoint.consumer.WeatherConsumer;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -8,16 +9,22 @@ import org.springframework.web.client.RestTemplate;
 
 import java.text.Normalizer;
 
-public abstract class Response {
+public abstract class Response extends WeatherConsumer {
     private RestTemplate restTemplate = new RestTemplate();
 
     public String generateResponse(String text) {
-        // Normalizer é usada para normalizar strings de acordo com regras
-        // Normalizer.Form.NFD normaliza para a forma NFD que remove diacríticos, incluindo acentos
         text = Normalizer.normalize(text.toLowerCase(), Normalizer.Form.NFD);
 
         if (text.contains("nome") || text.contains("chama")) {
             return "Meu nome é Gabriel Gomes Pacheco";
+        } else if (text.contains("tempo") || text.contains("temperatura") || text.contains("cidade")) {
+            try {
+                String weatherResponse = getWeatherAPIResponse();
+                return weatherResponse;
+            } catch (Exception e) {
+                System.out.println("Erro: " + e);
+            }
+            return "Desculpe, não foi possível gerar a resposta";
         } else if (text.contains("idade") || text.contains("anos")) {
             return "Eu tenho 18 anos de idade";
         } else if (text.contains("oi") || text.contains("ola")) {
@@ -47,4 +54,6 @@ public abstract class Response {
             System.out.println("Erro ao enviar mensagem: " + response.getBody());
         }
     }
+
+
 }
