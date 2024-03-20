@@ -14,33 +14,18 @@ import java.util.List;
 @RestController
 class WebhookController extends WebhookResponse {
     private String verifyToken = System.getenv("VERIFY_ACCESS_TOKEN");
-    private RestTemplate restTemplate = new RestTemplate();
 
     @PostMapping("/webhook")
     public ResponseEntity<WebhookObject> handleWebhookEvent(@RequestBody WebhookObject object) {
-        String recipientId = "";
-        String senderId = "";
-
-        String message = "";
-
         if (object.getObject().equals("page")) {
-            List<WebhookEntry> entryNode = object.getEntry();
-
             try {
-                for (WebhookEntry entry : entryNode) {
-                    recipientId = entry.getId();
+                String recipientId = object.getRecipientId();
+                String senderId = object.getSenderId();
+                String message = object.getTextMessage();
 
-                    List<WebhookEntryMessaging> messagingNode = entry.getMessaging();
-                    for (WebhookEntryMessaging messaging : messagingNode) {
-                        senderId = messaging.getSender().getId();
+                String response = generateResponseForWebhook(message);
+                sendResponseForWebhook(senderId, response, recipientId);
 
-                        message = messaging.getMessage().getText();
-
-                        String response = generateResponseForWebhook(message);
-
-                        sendResponseForWebhook(senderId, response, recipientId);
-                    }
-                }
             } catch (Exception e) {
                 System.out.println("Erro: " + e);
             }

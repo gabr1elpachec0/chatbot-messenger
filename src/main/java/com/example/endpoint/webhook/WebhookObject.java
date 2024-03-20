@@ -7,6 +7,9 @@ import java.util.List;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class WebhookObject {
     private String object;
+    private String recipientId;
+    private String senderId;
+    private String textMessage;
     private List<WebhookEntry> entry;
 
     public String getObject() {
@@ -23,5 +26,32 @@ public class WebhookObject {
 
     public void setEntry(List<WebhookEntry> entry) {
         this.entry = entry;
+    }
+
+    public String getRecipientId() {
+        for (WebhookEntry entry : entry) {
+            recipientId = entry.getId();
+        }
+        return recipientId;
+    }
+
+    public String getSenderId() {
+        for (WebhookEntry entry : entry) {
+            List<WebhookEntryMessaging> messagingNode = entry.getMessaging();
+            for (WebhookEntryMessaging messaging : messagingNode) {
+                senderId = messaging.getSender().getId();
+            }
+        }
+        return senderId;
+    }
+
+    public String getTextMessage() {
+        for (WebhookEntry entry : entry) {
+            List<WebhookEntryMessaging> messagingNode = entry.getMessaging();
+            for (WebhookEntryMessaging messaging : messagingNode) {
+                textMessage = messaging.getMessage().getText();
+            }
+        }
+        return textMessage;
     }
 }
