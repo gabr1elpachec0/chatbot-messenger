@@ -1,47 +1,52 @@
 package com.example.endpoint.controllers;
 
-import com.example.endpoint.Response;
+import com.example.endpoint.WebhookResponse;
+import com.example.endpoint.webhook.WebhookEntry;
+import com.example.endpoint.webhook.WebhookEntryMessaging;
+import com.example.endpoint.webhook.WebhookObject;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.List;
+
 @RestController
-class WebhookController extends Response {
+class WebhookController extends WebhookResponse {
     private String verifyToken = System.getenv("VERIFY_ACCESS_TOKEN");
+    private RestTemplate restTemplate = new RestTemplate();
 
     @PostMapping("/webhook")
-    public ResponseEntity<String> handleWebhookEvent(@RequestBody JsonNode payload) {
-        JsonNode objectNode = payload.get("object");
-        JsonNode entryNode = payload.get("entry");
+    public ResponseEntity<WebhookObject> handleWebhookEvent(@RequestBody WebhookObject object) {
+        String recipientId = "";
+        String senderId = "";
 
-        if (objectNode != null && objectNode.asText().equals("page")) {
-            if (entryNode != null && entryNode.isArray()) {
-                for (JsonNode entry : entryNode) {
-                    JsonNode messagingNode = entry.get("messaging");
-                    String pageId = entry.get("id").asText();
+        String message = "";
 
-                    if (messagingNode != null && messagingNode.isArray()) {
-                        for (JsonNode messaging : messagingNode) {
-                            JsonNode messageNode = messaging.get("message");
-                            JsonNode senderNode = messaging.get("sender");
+        if (object.getObject().equals("page")) {
+            List<WebhookEntry> entryNode = object.getEntry();
 
-                            if (messageNode != null && messageNode.has("text")) {
-                                String text = messageNode.get("text").asText();
-                                String senderId = senderNode.get("id").asText();
+            try {
+                for (WebhookEntry entry : entryNode) {
+                    recipientId = entry.getId();
 
-                                if (text != null) {
-                                    String responseText = generateResponse(text);
-                                    sendResponse(senderId, responseText, pageId);
-                                }
-                            }
-                        }
+                    List<WebhookEntryMessaging> messagingNode = entry.getMessaging();
+                    for (WebhookEntryMessaging messaging : messagingNode) {
+                        senderId = messaging.getSender().getId();
+
+                        message = messaging.getMessage().getText();
+
+                        String response = generateResponseForWebhook(message);
+
+                        sendResponseForWebhook(senderId, response, recipientId);
                     }
                 }
+            } catch (Exception e) {
+                System.out.println("Erro: " + e);
             }
-            return new ResponseEntity<>("EVENT_RECEIVED", HttpStatus.OK);
+            return ResponseEntity.ok().build();
         } else {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            return ResponseEntity.notFound().build();
         }
     }
 

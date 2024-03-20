@@ -1,6 +1,6 @@
 package com.example.endpoint;
 
-import com.example.endpoint.consumer.WeatherConsumer;
+import com.example.endpoint.consumers.WeatherAPIConsumer;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -9,10 +9,10 @@ import org.springframework.web.client.RestTemplate;
 
 import java.text.Normalizer;
 
-public abstract class Response extends WeatherConsumer {
+public abstract class WebhookResponse extends WeatherAPIConsumer {
     private RestTemplate restTemplate = new RestTemplate();
 
-    public String generateResponse(String text) {
+    public String generateResponseForWebhook(String text) {
         text = Normalizer.normalize(text.toLowerCase(), Normalizer.Form.NFD);
 
         if (text.contains("nome") || text.contains("chama")) {
@@ -34,7 +34,7 @@ public abstract class Response extends WeatherConsumer {
         }
     }
 
-    public void sendResponse(String recipientId, String responseText, String pageId) {
+    public void sendResponseForWebhook(String recipientId, String responseText, String pageId) {
         String pageAccessToken = System.getenv("PAGE_ACCESS_TOKEN");
 
         String url = "https://graph.facebook.com/v19.0/" + pageId + "/messages?access_token=" + pageAccessToken;
@@ -54,6 +54,4 @@ public abstract class Response extends WeatherConsumer {
             System.out.println("Erro ao enviar mensagem: " + response.getBody());
         }
     }
-
-
 }
