@@ -22,7 +22,7 @@ public abstract class WeatherAPIConsumer {
             ResponseEntity<WeatherResponse> weatherAPIResponse = restTemplate.getForEntity(url, WeatherResponse.class);
 
             temperature = (int) weatherAPIResponse.getBody().getMain().getTemp();
-            feelsLike = (int) weatherAPIResponse.getBody().getMain().getFeels_like();
+            feelsLike = (int) weatherAPIResponse.getBody().getMain().getFeelsLike();
 
             cityName = weatherAPIResponse.getBody().getName();
 
