@@ -28,6 +28,7 @@ public class WebhookObject {
         this.entry = entry;
     }
 
+    // getMessagesFromUsers
     public String getRecipientId() {
         for (WebhookEntry entry : entry) {
             recipientId = entry.getId();

@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class WeatherResponseMain {
     private double temp;
+    // CamelCase -> Jackson
     private double feels_like;
 
     public double getTemp() {

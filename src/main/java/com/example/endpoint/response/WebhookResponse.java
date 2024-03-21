@@ -1,37 +1,43 @@
-package com.example.endpoint;
+package com.example.endpoint.response;
 
 import com.example.endpoint.consumers.WeatherAPIConsumer;
+import com.example.endpoint.response.variations.AgeResponse;
+import com.example.endpoint.response.variations.GreetingResponse;
+import com.example.endpoint.response.variations.WeatherResponse;
+import com.example.endpoint.response.variations.WhatIsYourNameResponse;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
 
-import java.text.Normalizer;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
-public abstract class WebhookResponse extends WeatherAPIConsumer {
+public abstract class WebhookResponse {
+    private String textMessage;
     private RestTemplate restTemplate = new RestTemplate();
 
     public String generateResponseForWebhook(String text) {
-        text = Normalizer.normalize(text.toLowerCase(), Normalizer.Form.NFD);
+        textMessage = text;
 
-        if (text.contains("nome") || text.contains("chama")) {
-            return "Meu nome é Gabriel Gomes Pacheco";
-        } else if (text.contains("tempo") || text.contains("temperatura") || text.contains("cidade")) {
-            try {
-                String weatherResponse = getWeatherAPIResponse();
-                return weatherResponse;
-            } catch (Exception e) {
-                System.out.println("Erro: " + e);
-            }
-            return "Desculpe, não foi possível gerar a resposta";
-        } else if (text.contains("idade") || text.contains("anos")) {
-            return "Eu tenho 18 anos de idade";
-        } else if (text.contains("oi") || text.contains("ola")) {
-            return "Olá, sou um bot do Messenger!";
+        if (hasPattern("\\b(?:oi|ola)\\b")) {
+            return new GreetingResponse().getResponse();
+        } else if (hasPattern("\\b(?:nome|chama)")) {
+            return new WhatIsYourNameResponse().getResponse();
+        } else if (hasPattern("\\b(?:idade|anos)\\b")) {
+            return new AgeResponse().getResponse();
+        } else if (hasPattern("\\b(?:cidade|tempo|temperatura)\\b")) {
+            return new WeatherResponse().getResponse();
         } else {
             return "Desculpe, ainda não consigo responder a isso";
         }
+    }
+
+    private boolean hasPattern(String regex) {
+        Pattern pattern = Pattern.compile(regex, Pattern.CASE_INSENSITIVE);
+        Matcher matcher = pattern.matcher(textMessage);
+        return matcher.find();
     }
 
     public void sendResponseForWebhook(String recipientId, String responseText, String pageId) {

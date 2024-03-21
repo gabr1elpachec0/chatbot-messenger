@@ -1,15 +1,9 @@
 package com.example.endpoint.controllers;
 
-import com.example.endpoint.WebhookResponse;
-import com.example.endpoint.webhook.WebhookEntry;
-import com.example.endpoint.webhook.WebhookEntryMessaging;
+import com.example.endpoint.response.WebhookResponse;
 import com.example.endpoint.webhook.WebhookObject;
-import com.fasterxml.jackson.databind.JsonNode;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.client.RestTemplate;
-
-import java.util.List;
 
 @RestController
 class WebhookController extends WebhookResponse {
