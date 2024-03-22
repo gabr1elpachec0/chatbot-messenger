@@ -1,11 +1,13 @@
 package com.example.endpoint.weather;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class WeatherResponse {
     private WeatherResponseMain main;
-    private String name;
+    @JsonProperty("name")
+    private String cityName;
 
     public WeatherResponseMain getMain() {
         return main;
@@ -15,11 +17,11 @@ public class WeatherResponse {
         this.main = main;
     }
 
-    public String getName() {
-        return name;
+    public String getCityName() {
+        return cityName;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setCityName(String cityName) {
+        this.cityName = cityName;
     }
 }

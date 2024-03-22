@@ -1,5 +1,6 @@
 package com.example.endpoint.controllers;
 
+import com.example.endpoint.response.ResponseBody;
 import com.example.endpoint.response.WebhookResponse;
 import com.example.endpoint.webhook.WebhookObject;
 import org.springframework.http.*;
@@ -7,19 +8,22 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 class WebhookController extends WebhookResponse {
-    private String verifyToken = System.getenv("VERIFY_ACCESS_TOKEN");
+    private final String verifyToken = System.getenv("VERIFY_ACCESS_TOKEN");
 
     @PostMapping("/webhook")
     public ResponseEntity<WebhookObject> handleWebhookEvent(@RequestBody WebhookObject object) {
         if (object.getObject().equals("page")) {
             try {
-                String recipientId = object.getRecipientId();
+                String pageId = object.getPageId();
                 String senderId = object.getSenderId();
-                String message = object.getTextMessage();
+                String textMessage = object.getTextMessage();
 
-                String response = generateResponseForWebhook(message);
-                sendResponseForWebhook(senderId, response, recipientId);
+                String response = generateResponseForWebhook(textMessage);
 
+                ResponseBody responseBody = new ResponseBody(senderId, response);
+                String body = responseBody.buildBodyMessageForResponseType();
+
+                sendResponseForWebhook(body, pageId);
             } catch (Exception e) {
                 System.out.println("Erro: " + e);
             }
