@@ -2,4 +2,4 @@
   🤖 Messenger's Chatbot
 </h1>
 
-📌 - ``This chatbot was built using Meta Webhooks for Messenger and Java as the main programming language.``
+📌 ``This chatbot was built using Meta Webhooks for Messenger and Java as the main programming language.``
