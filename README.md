@@ -3,12 +3,5 @@
 </h1>
 
 <p>
-  ```📌 This chatbot was built using Meta Webhooks for Messenger and Java as the main programming language.```
-</p>
-
-<p>
-  - ``teste``
-  - ``teste``
-  - ``teste``
-  
+  📌 This chatbot was built using Meta Webhooks for Messenger and Java as the main programming language.
 </p>
