@@ -1,7 +1,7 @@
 package com.example.messengerendpoint.response;
 
+import com.example.messengerendpoint.VerificationStrategy;
 import com.example.messengerendpoint.response.variations.*;
-import com.google.cloud.dialogflow.v2.QueryResult;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -9,52 +9,21 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
 
 import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.time.LocalDate;
 import java.util.*;
 
-public abstract class WebhookResponse {
-    private String textMessage;
+public class WebhookResponse {
     private final String pageAccessToken = System.getenv("PAGE_ACCESS_TOKEN");
     private final RestTemplate restTemplate = new RestTemplate();
-    private String sessionId = UUID.randomUUID().toString();
-    private String cityName = "";
-    private String date = "";
+    private final List<VerificationStrategy> strategies;
+
+    public WebhookResponse(List<VerificationStrategy> strategies) {
+        this.strategies = strategies;
+    }
 
     public String generateResponseForWebhook(String text) throws IOException {
-        textMessage = text;
-        List<String> texts = new ArrayList<String>();
-        texts.add(text);
-
-        Map<String, QueryResult> results = com.example.endpoint.response.DetectIntentTexts.detectIntentTexts("messenger-bot-418619", texts, sessionId, "pt-BR");
-
-        for (Map.Entry<String, QueryResult> entry : results.entrySet()) {
-            QueryResult queryResult = entry.getValue();
-
-            if (queryResult.getIntent().getDisplayName().equals("Greetings")) {
-                return new GreetingResponse().getResponse();
-            } else if (queryResult.getIntent().getDisplayName().equals("Name")) {
-                return new WhatIsYourNameResponse().getResponse();
-            } else if (queryResult.getIntent().getDisplayName().equals("Age")) {
-                return new AgeResponse().getResponse();
-            } else if (queryResult.getIntent().getDisplayName().equals("Weather")) {
-                String fullfillmentText = queryResult.getFulfillmentText();
-                if (fullfillmentText != "") {
-                    return fullfillmentText;
-                } else {
-                    cityName = queryResult.getParameters().getFieldsOrThrow("city").getStringValue();
-                    date = queryResult.getParameters().getFieldsOrThrow("date-time").getStringValue();
-
-                    LocalDate correctDate = LocalDate.parse(date.split("T")[0]);
-
-                    LocalDate now = LocalDate.now();
-
-                    if (correctDate.equals(now)) {
-                        return new CurrentWeatherResponse().getCurrentWeatherResponse(cityName);
-                    } else {
-                        return new WeatherForecastResponse().getResponse(cityName, date);
-                    }
-                }
+        for (VerificationStrategy strategy : strategies) {
+            if (strategy.isStrategy(text)) {
+                return strategy.getResponse();
             }
         }
         return new ErrorResponse().getResponse();

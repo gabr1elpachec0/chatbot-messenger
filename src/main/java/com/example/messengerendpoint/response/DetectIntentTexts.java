@@ -1,4 +1,4 @@
-package com.example.endpoint.response;
+package com.example.messengerendpoint.response;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.api.gax.rpc.ApiException;
@@ -9,9 +9,6 @@ import com.google.cloud.dialogflow.v2.SessionName;
 import com.google.cloud.dialogflow.v2.SessionsClient;
 import com.google.cloud.dialogflow.v2.TextInput;
 import com.google.common.collect.Maps;
-import com.google.protobuf.Descriptors;
-import com.google.protobuf.Struct;
-import com.google.protobuf.Value;
 
 import java.io.IOException;
 import java.util.List;

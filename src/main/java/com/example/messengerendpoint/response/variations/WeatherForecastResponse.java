@@ -5,8 +5,7 @@ import com.example.messengerendpoint.consumers.WeatherAPIConsumer;
 public class WeatherForecastResponse extends WeatherAPIConsumer {
     public String getResponse(String cityName, String date) {
         try {
-            String response = getWeatherForecast(cityName, date);
-            return response;
+            return getWeatherForecast(cityName, date);
         } catch (Exception e) {
             System.out.println("Erro: " + e);
         }

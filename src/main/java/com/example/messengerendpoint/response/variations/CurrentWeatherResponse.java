@@ -6,8 +6,7 @@ public class CurrentWeatherResponse extends WeatherAPIConsumer {
 
     public String getResponse(String cityName) {
         try {
-            String weatherResponse = getCurrentWeatherResponse(cityName);
-            return weatherResponse;
+            return getCurrentWeatherResponse(cityName);
         } catch (Exception e) {
             System.out.println("Erro: " + e);
         }
