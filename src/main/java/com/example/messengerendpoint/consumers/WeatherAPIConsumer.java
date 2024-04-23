@@ -7,29 +7,11 @@ import org.springframework.web.client.RestTemplate;
 
 public abstract class WeatherAPIConsumer {
     private final String APIKey = System.getenv("API_KEY");
-    private String cityName = "";
     private int temperature = 0;
     private int thermalSensation = 0;
     private final RestTemplate restTemplate = new RestTemplate();
 
-    public String getCurrentWeatherInMyCityResponse() {
-        String currentWeatherURL = "https://api.openweathermap.org/data/2.5/weather?units=metric&q=Gravataí&appid=" + APIKey;
-
-        try {
-            ResponseEntity<WeatherResponse> weatherAPIResponse = restTemplate.getForEntity(currentWeatherURL, WeatherResponse.class);
-
-            temperature = (int) weatherAPIResponse.getBody().getMain().getTemp();
-            thermalSensation = (int) weatherAPIResponse.getBody().getMain().getFeelsLike();
-
-        } catch (Exception e) {
-            System.out.println("Erro: " + e);
-        }
-
-        return "A temperatura atual em Gravataí é de " + temperature + "ºC, com sensação térmica de " + thermalSensation + "ºC";
-    }
-
     public String getCurrentWeatherResponse(String cityName) {
-        this.cityName = cityName;
         String currentWeatherURL = "https://api.openweathermap.org/data/2.5/weather?units=metric&q=" + cityName + "&appid=" + APIKey;
         try {
             ResponseEntity<WeatherResponse> weatherAPIResponse = restTemplate.getForEntity(currentWeatherURL, WeatherResponse.class);
@@ -46,7 +28,6 @@ public abstract class WeatherAPIConsumer {
     }
 
     public String getWeatherForecast(String cityName, String date) {
-        this.cityName = cityName;
         String weatherForecastURL = "https://api.openweathermap.org/data/2.5/forecast?q=" + cityName + "&appid=" + APIKey + "&units=metric";
 
         try {
